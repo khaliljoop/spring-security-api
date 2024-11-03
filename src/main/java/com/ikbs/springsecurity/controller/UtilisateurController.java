@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 
 @AllArgsConstructor
 @RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -20,6 +22,11 @@ public class UtilisateurController {
     @PostMapping(path="inscription")
     public void inscription(@RequestBody Utilisateur utilisateur) {
         utilisateurService.inscription(utilisateur);
+    }
+
+    @PostMapping(path = "activation")
+    public void activation(@RequestBody Map<String,String>activation){
+        this.utilisateurService.activation(activation);
     }
 
 }
