@@ -7,6 +7,10 @@ import com.ikbs.springsecurity.entite.Utilisateur;
 import com.ikbs.springsecurity.entite.Validation;
 import com.ikbs.springsecurity.repository.IUtilisateur;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +20,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Service
-public class UtilisateurService {
+public class UtilisateurService implements UserDetailsService {
     private IUtilisateur iUtilisateur;
     private BCryptPasswordEncoder passwordEncoder;
     private ValidationService validationService;
@@ -48,5 +52,10 @@ public class UtilisateurService {
            _user.setActif(true);
            this.iUtilisateur.save(_user);
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return this.iUtilisateur.findByEmail(username).orElseThrow(()->new UsernameNotFoundException(username));
     }
 }
