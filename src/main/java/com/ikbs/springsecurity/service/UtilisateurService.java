@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Service
 public class UtilisateurService implements UserDetailsService {
     private IUtilisateur iUtilisateur;
