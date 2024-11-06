@@ -2,6 +2,7 @@ package com.ikbs.springsecurity.securite;
 
 
 import com.ikbs.springsecurity.constantes.Constantes;
+import com.ikbs.springsecurity.entite.Jwt;
 import com.ikbs.springsecurity.entite.Utilisateur;
 import com.ikbs.springsecurity.service.UtilisateurService;
 import io.jsonwebtoken.Claims;
@@ -26,7 +27,9 @@ public class JwtService {
     private UtilisateurService utilisateurService;
     public Map<String,String> generate(String username){
         Utilisateur user=(Utilisateur)this.utilisateurService.loadUserByUsername(username);
-        return this.generateJwt(user);
+        final Map<String, String> jwtMap = this.generateJwt(user);
+        Jwt.builder().deactivated(false).expired(false).utilisateur(user);
+        return jwtMap;
     }
 
     public String extactUsername(String token) {
@@ -45,14 +48,12 @@ public class JwtService {
 
     private Claims getAllClaims(String token) {
 
-        final Claims claims = Jwts
+        return Jwts
                 .parser()
                 .verifyWith((SecretKey)genKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        log.info("Token claims : {}", claims);
-        return claims;
     }//
 
     private Map<String, String> generateJwt(Utilisateur user) {
