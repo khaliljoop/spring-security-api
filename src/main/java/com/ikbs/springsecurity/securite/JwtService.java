@@ -4,31 +4,50 @@ package com.ikbs.springsecurity.securite;
 import com.ikbs.springsecurity.constantes.Constantes;
 import com.ikbs.springsecurity.entite.Jwt;
 import com.ikbs.springsecurity.entite.Utilisateur;
+import com.ikbs.springsecurity.repository.Ijwt;
 import com.ikbs.springsecurity.service.UtilisateurService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Transactional
 @AllArgsConstructor
 @Service
 public class JwtService {
+
     private static final Logger log = LoggerFactory.getLogger(JwtService.class);
+    private Ijwt ijwt;
+    public static final String BEARER = "bearer";
     private UtilisateurService utilisateurService;
     public Map<String,String> generate(String username){
         Utilisateur user=(Utilisateur)this.utilisateurService.loadUserByUsername(username);
+        this.disableTokens(user);
         final Map<String, String> jwtMap = this.generateJwt(user);
-        Jwt.builder().deactivated(false).expired(false).utilisateur(user);
+        final Jwt jwt=Jwt
+                .builder()
+                .valeur(jwtMap.get(BEARER))
+                .deactivated(false)
+                .expired(false)
+                .utilisateur(user).build();
+        this.ijwt.save(jwt);
         return jwtMap;
     }
 
@@ -72,7 +91,7 @@ public class JwtService {
                 .claims(claims)
                 .signWith(genKey())
                 .compact();
-        return Map.of("bearer",bearer);
+        return Map.of(BEARER,bearer);
     }
 
     private Key genKey() {
@@ -80,5 +99,40 @@ public class JwtService {
         return Keys.hmacShaKeyFor(decode);
     }
 
-    
+
+    public Jwt tokenByValue(String token) {
+        return this.ijwt.findByValeur(token)
+                .orElseThrow(()->new RuntimeException("token not found"));
+    }
+
+    public void disableTokens(Utilisateur utilisateur) {
+        List<Jwt> jwtList = this.ijwt.findByEmail(utilisateur.getEmail())
+                .peek(
+                        jwt -> {
+                            jwt.setExpired(true);
+                            jwt.setDeactivated(true);
+                        }
+                ).toList();
+        this.ijwt.saveAll(jwtList);
+    }
+    public void deconnexion() {
+        Utilisateur utilisateur = (Utilisateur)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+       Jwt jwt= this.ijwt
+               .findByValeurValideToken(
+                       utilisateur.getEmail(),
+                       false,
+                       false)
+               .orElseThrow(()->new RuntimeException("token not found"));
+       jwt.setExpired(true);
+       jwt.setDeactivated(true);
+       this.ijwt.save(jwt);
+    }
+    // lien util https://crontab.guru/
+    //@Scheduled(cron = "@daily")
+    @Scheduled(cron = "0 */1 * * * *")
+    public void removeUselessJwt(){
+        log.info("suppression des tokens {}", Instant.now());
+        this.ijwt.deleteAllByExpiredAndDeactivated(true,true);
+    }
 }
