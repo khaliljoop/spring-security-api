@@ -8,6 +8,8 @@ import com.ikbs.springsecurity.entite.Validation;
 import com.ikbs.springsecurity.repository.IUtilisateur;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +23,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Service
 public class UtilisateurService implements UserDetailsService {
+    private static final Logger log = LoggerFactory.getLogger(UtilisateurService.class);
     private IUtilisateur iUtilisateur;
     private BCryptPasswordEncoder passwordEncoder;
     private ValidationService validationService;
@@ -57,5 +60,22 @@ public class UtilisateurService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.iUtilisateur.findByEmail(username).orElseThrow(()->new UsernameNotFoundException(username));
+    }
+
+    public void modifierMotDePasse(Map<String, String> parametres) {
+        Utilisateur utilisateur =(Utilisateur) this.loadUserByUsername(parametres.get("email"));
+        log.info("User load: {}",utilisateur);
+        this.validationService.enregistrer(utilisateur);
+
+    }
+
+    public void nouveauMotDePasse(Map<String, String> parametres) {
+        Utilisateur utilisateur =(Utilisateur) this.loadUserByUsername(parametres.get("email"));
+        Validation validation=this.validationService.getValidationByCode(parametres.get("code"));
+       if(validation.getUtilisateur().getEmail().equals(utilisateur.getEmail())){
+           final String passcrypt=this.passwordEncoder.encode(parametres.get("password"));
+           utilisateur.setMdp(passcrypt);
+           this.iUtilisateur.save(utilisateur);
+       }
     }
 }

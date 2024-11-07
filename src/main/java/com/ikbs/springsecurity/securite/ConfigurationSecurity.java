@@ -37,6 +37,8 @@ public class ConfigurationSecurity {
                                 .requestMatchers(POST,"/inscription").permitAll()
                                 .requestMatchers(POST,"/activation").permitAll()
                                 .requestMatchers(POST,"/connexion").permitAll()
+                                .requestMatchers(POST,"/reset-password").permitAll()
+                                .requestMatchers(POST,"/newpassword").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(

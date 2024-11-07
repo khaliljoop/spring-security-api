@@ -1,12 +1,14 @@
 package com.ikbs.springsecurity.service;
 
 
-import com.ikbs.springsecurity.entite.Avis;
 import com.ikbs.springsecurity.entite.Utilisateur;
 import com.ikbs.springsecurity.entite.Validation;
 import com.ikbs.springsecurity.repository.IValidation;
-import com.ikbs.springsecurity.repository.Iavis;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,9 +17,11 @@ import java.util.Random;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 
+@Transactional
 @AllArgsConstructor
 @Service
 public class ValidationService {
+    private static final Logger log = LoggerFactory.getLogger(ValidationService.class);
     private final IValidation iValidation;
     private final NotificationService notificationService;
 
@@ -42,5 +46,13 @@ public class ValidationService {
 
     public Validation getValidationByCode(String code) {
         return this.iValidation.findByCode(code).orElseThrow(()->new RuntimeException(""));
+    }
+
+    // lien util : https://crontab.guru/
+    @Scheduled(cron = "0 */1 * * * *")
+    public void cleanTable() {
+
+        log.info("clean tab {}", Instant.now());
+        this.iValidation.deleteAllByExpiredBefore(Instant.now());
     }
 }

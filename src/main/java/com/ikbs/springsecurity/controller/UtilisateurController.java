@@ -38,6 +38,15 @@ public class UtilisateurController {
     public void activation(@RequestBody Map<String,String>activation){
         this.utilisateurService.activation(activation);
     }
+    @PostMapping(path = "reset-password")
+    public void modifierMotDePasse(@RequestBody Map<String,String>activation){
+        log.info("reset-password {}", activation);
+        this.utilisateurService.modifierMotDePasse(activation);
+    }
+    @PostMapping(path = "newpassword")
+    public void nouveauMotDePasse(@RequestBody Map<String,String>activation){
+        this.utilisateurService.nouveauMotDePasse(activation);
+    }
 
     @PostMapping(path = "deconnexion")
     public void deconnexion(){

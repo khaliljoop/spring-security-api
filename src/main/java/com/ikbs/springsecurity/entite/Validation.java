@@ -21,6 +21,6 @@ public class Validation {
     private Instant created;
     private Instant expired;
     private String code;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Utilisateur utilisateur;
 }
