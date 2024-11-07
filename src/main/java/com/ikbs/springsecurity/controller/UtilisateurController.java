@@ -43,6 +43,7 @@ public class UtilisateurController {
         log.info("reset-password {}", activation);
         this.utilisateurService.modifierMotDePasse(activation);
     }
+
     @PostMapping(path = "newpassword")
     public void nouveauMotDePasse(@RequestBody Map<String,String>activation){
         this.utilisateurService.nouveauMotDePasse(activation);
@@ -63,5 +64,10 @@ public class UtilisateurController {
             return jwtService.generate(authenticationDTO.username());
         }
         return null;
+    }
+
+    @PostMapping(path = "refresh-token")
+    public void refreshToken(@RequestBody Map<String,String>refreshTokenRequest){
+        this.jwtService.refreshToken(refreshTokenRequest);
     }
 }

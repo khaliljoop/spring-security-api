@@ -20,4 +20,6 @@ public class Jwt {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE})
     @JoinColumn(name = "user_id")
     private Utilisateur utilisateur;
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private RefreshJwt refreshJwt;
 }

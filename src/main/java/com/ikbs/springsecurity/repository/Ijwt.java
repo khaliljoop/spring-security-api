@@ -14,6 +14,8 @@ public interface Ijwt extends CrudRepository<Jwt,Integer> {
 
     @Query("from Jwt j where j.deactivated=:deactivated and j.expired=:expired and j.utilisateur.email=:email")
     Optional<Jwt>  findByValeurValideToken(String email, Boolean deactivated, Boolean expired);
+    @Query("from Jwt j where  j.refreshJwt.valeur=:valeur")
+    Optional<Jwt>  findByRefreshJwt(String valeur);
 
     @Query("from Jwt j where j.utilisateur.email=:email")
     Stream<Jwt> findByEmail(String email);
