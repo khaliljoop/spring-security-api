@@ -25,7 +25,6 @@ import java.security.Key;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Transactional
 @AllArgsConstructor
@@ -44,8 +43,9 @@ public class JwtService {
         RefreshJwt refreshJwt=RefreshJwt
                 .builder()
                 .valeur(UUID.randomUUID().toString())
+                .expired(false)
                 .created(Instant.now())
-                .expired(Instant.now().plusMillis(30*60*1000))
+                .expiration(Instant.now().plusMillis(30*60*1000))
                 .build();
         final Jwt jwt=Jwt
                 .builder()
@@ -137,15 +137,16 @@ public class JwtService {
        this.ijwt.save(jwt);
     }
 
-    public Jwt findRefreshByValeur(Map<String,String>refreshToken){
+    public Map<String,String> refreshToken(Map<String,String>refreshToken){
 
+        log.info("find refresh-token {}",this.ijwt.findByRefreshJwt(refreshToken.get(REFRESH_JWT)));
         final  Jwt jwt= this.ijwt.findByRefreshJwt(refreshToken.get(REFRESH_JWT))
+
                 .orElseThrow(()->new RuntimeException("Not fount"));
-        if(jwt.isExpired() || jwt.getRefreshJwt().getExpired().isBefore(Instant.now())){
+        if(jwt.getRefreshJwt().isExpired() || jwt.getRefreshJwt().getExpiration().isBefore(Instant.now())){
             throw  new RuntimeException("Not fount");
         }
-         Map<String,String>res=this.generate(jwt.getUtilisateur().getEmail());
-        return null;
+        return this.generate(jwt.getUtilisateur().getEmail());
     }
     // lien util https://crontab.guru/
     //@Scheduled(cron = "@daily")

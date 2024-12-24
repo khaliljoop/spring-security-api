@@ -1,10 +1,7 @@
 package com.ikbs.springsecurity.entite;
-
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.Instant;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -18,7 +15,8 @@ public class RefreshJwt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Instant created;
-    private Instant expired ;
+    private Instant expiration;
+    private boolean expired;
     private String valeur;
 }
 

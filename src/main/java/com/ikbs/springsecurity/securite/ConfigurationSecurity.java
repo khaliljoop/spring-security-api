@@ -39,6 +39,7 @@ public class ConfigurationSecurity {
                                 .requestMatchers(POST,"/connexion").permitAll()
                                 .requestMatchers(POST,"/reset-password").permitAll()
                                 .requestMatchers(POST,"/newpassword").permitAll()
+                                .requestMatchers(POST,"/refresh-token").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(
