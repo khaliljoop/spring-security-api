@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 
 
@@ -44,7 +43,7 @@ public class UtilisateurController {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationDTO.username(), authenticationDTO.password())
         );
-
+        log.info("Authentication: {}", authenticate);
         if(authenticate.isAuthenticated()){
             return jwtService.generate(authenticationDTO.username());
         }

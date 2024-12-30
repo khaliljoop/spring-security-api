@@ -1,6 +1,5 @@
 package com.ikbs.springsecurity.securite;
 
-
 import com.ikbs.springsecurity.constantes.Constantes;
 import com.ikbs.springsecurity.entite.Utilisateur;
 import com.ikbs.springsecurity.service.UtilisateurService;
@@ -12,7 +11,6 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
@@ -53,8 +51,7 @@ public class JwtService {
                 .getPayload();
         log.info("Token claims : {}", claims);
         return claims;
-    }//
-
+    }
     private Map<String, String> generateJwt(Utilisateur user) {
         final long currentTime = System.currentTimeMillis();
         final long expirationTime = currentTime+1000*30*60;//1000*60*60*24;

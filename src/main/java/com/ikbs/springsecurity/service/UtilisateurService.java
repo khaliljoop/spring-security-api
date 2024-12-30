@@ -7,7 +7,6 @@ import com.ikbs.springsecurity.entite.Utilisateur;
 import com.ikbs.springsecurity.entite.Validation;
 import com.ikbs.springsecurity.repository.IUtilisateur;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
